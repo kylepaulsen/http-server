@@ -22,7 +22,7 @@ if (argv.h || argv.help) {
     "  -i                 Display autoIndex [true]",
     "  -e --ext           Default file extension if none supplied [none]",
     "  -s --silent        Suppress log messages from output",
-    "  --cors             Enable CORS via the 'Access-Control-Allow-Origin' header",
+    "  --nocors           Disable CORS via the 'Access-Control-Allow-Origin' header",
     "  -o                 Open browser window after staring the server",
     "  -c                 Cache time (max-age) in seconds [3600], e.g. -c10 for 10 seconds.",
     "                     To disable caching, use -c-1.",
@@ -68,14 +68,15 @@ function listen(port) {
     showDir: argv.d,
     autoIndex: argv.i,
     ext: argv.e || argv.ext,
-    logFn: requestLogger
-  };
-
-  if (argv.cors) {
-    options.headers = {
+    logFn: requestLogger,
+    headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-    };
+    }
+  };
+
+  if (argv.nocors) {
+    delete options.headers;
   }
 
   var createServer = function() {
