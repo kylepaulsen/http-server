@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-var colors = require('colors'),
+var fs = require('fs'),
+    path = require('path'),
+    exec = require('child_process').exec,
+    colors = require('colors'),
     httpServer = require('../lib/http-server'),
     portfinder = require('portfinder'),
     opener = require('opener'),
@@ -37,6 +40,9 @@ var port = argv.p || parseInt(process.env.PORT, 10),
     host = argv.a || '0.0.0.0',
     log = (argv.s || argv.silent) ? (function () {}) : console.log,
     ssl = !!argv.S || !!argv.ssl,
+    defaultKeyPath = path.join(__dirname, 'key.pem'),
+    defaultCertPath = path.join(__dirname, 'cert.pem'),
+    defaultCSRPath = path.join(__dirname, 'csr.pem'),
     requestLogger;
 
 if (!argv.s && !argv.silent) {
@@ -72,27 +78,64 @@ function listen(port) {
     };
   }
 
+  var createServer = function() {
+    var server = httpServer.createServer(options);
+    server.listen(port, host, function() {
+      var uri = [ssl ? 'https' : 'http', '://', host, ':', port].join('');
+      log('Starting up http-server, serving '.yellow
+        + server.root.cyan
+        + ((ssl) ? ' through'.yellow + ' https'.cyan : '')
+        + ' on: '.yellow
+        + uri.cyan);
+
+      log('Hit CTRL-C to stop the server');
+      if (argv.o) {
+        opener(uri);
+      }
+    });
+  };
+
   if (ssl) {
     options.https = {
       cert: argv.C || argv.cert || 'cert.pem',
       key: argv.K || argv.key || 'key.pem'
     };
+
+    if (!fs.existsSync(options.https.key)) {
+      log('Could not find key file.'.yellow);
+      options.https.cert = defaultCertPath;
+      options.https.key = defaultKeyPath;
+
+      var handleCreatingCertError = function(err) {
+        if (err) {
+          log(('Error creating cert: ' + err).red + '\nMake sure you can run the openssl command.'.yellow);
+        }
+      };
+
+      if (!fs.existsSync(defaultCertPath)) {
+        log('Generating and using default cert and key files in: '.yellow + __dirname.cyan);
+        exec('openssl genrsa -out ' + defaultKeyPath + ' 4096', function(err) {
+          handleCreatingCertError(err);
+          err || exec('openssl req -new -key ' + defaultKeyPath + ' -out ' + defaultCSRPath +
+            ' -subj "/C=US/ST=California/L=San Francisco/O=Local-Company' +
+            '/OU=dev/CN=localhost/emailAddress=test@test.com"', function(err) {
+
+            handleCreatingCertError(err);
+            err || exec('openssl x509 -req -days 9999 -in ' + defaultCSRPath + ' -signkey ' +
+              defaultKeyPath + ' -out ' + defaultCertPath, function(err) {
+
+              handleCreatingCertError(err);
+              err || createServer();
+            });
+          });
+        });
+        return;
+      }
+      log('Using default cert and key files in: '.yellow + __dirname.cyan);
+    }
   }
 
-  var server = httpServer.createServer(options);
-  server.listen(port, host, function() {
-    var uri = [ssl ? 'https' : 'http', '://', host, ':', port].join('');
-    log('Starting up http-server, serving '.yellow
-      + server.root.cyan
-      + ((ssl) ? ' through'.yellow + ' https'.cyan : '')
-      + ' on: '.yellow
-      + uri.cyan);
-
-    log('Hit CTRL-C to stop the server');
-    if (argv.o) {
-      opener(uri);
-    }
-  });
+  createServer();
 }
 
 if (process.platform !== 'win32') {
