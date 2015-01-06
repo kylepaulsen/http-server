@@ -102,8 +102,8 @@ function listen(port) {
       key: argv.K || argv.key || 'key.pem'
     };
 
-    if (!fs.existsSync(options.https.key)) {
-      log('Could not find key file.'.yellow);
+    if (!fs.existsSync(options.https.cert)) {
+      log('Could not find cert file.'.yellow);
       options.https.cert = defaultCertPath;
       options.https.key = defaultKeyPath;
 
@@ -122,7 +122,7 @@ function listen(port) {
             '/OU=dev/CN=localhost/emailAddress=test@test.com"', function(err) {
 
             handleCreatingCertError(err);
-            err || exec('openssl x509 -req -days 9999 -in ' + defaultCSRPath + ' -signkey ' +
+            err || exec('openssl x509 -req -days 1000 -in ' + defaultCSRPath + ' -signkey ' +
               defaultKeyPath + ' -out ' + defaultCertPath, function(err) {
 
               handleCreatingCertError(err);
