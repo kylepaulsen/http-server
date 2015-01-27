@@ -8,7 +8,10 @@
 
 Installation via `npm`.  If you don't have `npm` yet:
 
-     curl https://npmjs.org/install.sh | sh
+     // Install Node.js!!! Go here and download:
+     http://nodejs.org/
+     
+     // Afterwards you should have node and npm ready to use in your console!
 
 Once you have `npm`:
 
