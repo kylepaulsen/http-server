@@ -12,6 +12,10 @@ Installation via `npm`.  If you don't have `npm` yet:
 
 Once you have `npm`:
 
+     // For my forked version:
+     npm install -g git+https://github.com/kylepaulsen/http-server.git
+     
+     // For the original version:
      npm install http-server -g
 
 This will install `http-server` globally so that it may be run from the command line.
@@ -58,7 +62,7 @@ This will install `http-server` globally so that it may be run from the command 
 
 `-s` or `--silent` Suppress log messages from output
 
-`--cors` Enable CORS via the `Access-Control-Allow-Origin` header
+`--nocors` Disable CORS via the `Access-Control-Allow-Origin` header
 
 `-o` Open browser window after staring the server
 
