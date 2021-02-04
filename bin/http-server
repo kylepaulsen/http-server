@@ -122,8 +122,8 @@ function listen(port) {
             '/OU=dev/CN=localhost/emailAddress=test@test.com"', function(err) {
 
             handleCreatingCertError(err);
-            err || exec('openssl x509 -req -days 1000 -in "' + defaultCSRPath + '" -signkey ' +
-              defaultKeyPath + ' -out "' + defaultCertPath + '"', function(err) {
+            err || exec('openssl x509 -req -days 1000 -in "' + defaultCSRPath + '" -signkey "' +
+              defaultKeyPath + '" -out "' + defaultCertPath + '"', function(err) {
 
               handleCreatingCertError(err);
               err || createServer();
