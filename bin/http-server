@@ -117,7 +117,7 @@ function listen(port) {
         log('Generating and using default cert and key files in: '.yellow + __dirname.cyan);
         exec('openssl genrsa -out ' + defaultKeyPath + ' 4096', function(err) {
           handleCreatingCertError(err);
-          err || exec('openssl req -new -key ' + defaultKeyPath + ' -out ' + defaultCSRPath +
+          err || exec('openssl req -new -key "' + defaultKeyPath + '" -out ' + defaultCSRPath +
             ' -subj "/C=US/ST=California/L=San Francisco/O=Local-Company' +
             '/OU=dev/CN=localhost/emailAddress=test@test.com"', function(err) {
 
