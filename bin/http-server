@@ -115,15 +115,15 @@ function listen(port) {
 
       if (!fs.existsSync(defaultCertPath)) {
         log('Generating and using default cert and key files in: '.yellow + __dirname.cyan);
-        exec('openssl genrsa -out ' + defaultKeyPath + ' 4096', function(err) {
+        exec('openssl genrsa -out "' + defaultKeyPath + '" 4096', function(err) {
           handleCreatingCertError(err);
-          err || exec('openssl req -new -key ' + defaultKeyPath + ' -out ' + defaultCSRPath +
-            ' -subj "/C=US/ST=California/L=San Francisco/O=Local-Company' +
+          err || exec('openssl req -new -key "' + defaultKeyPath + '" -out "' + defaultCSRPath +
+            '" -subj "/C=US/ST=California/L=San Francisco/O=Local-Company' +
             '/OU=dev/CN=localhost/emailAddress=test@test.com"', function(err) {
 
             handleCreatingCertError(err);
-            err || exec('openssl x509 -req -days 1000 -in ' + defaultCSRPath + ' -signkey ' +
-              defaultKeyPath + ' -out ' + defaultCertPath, function(err) {
+            err || exec('openssl x509 -req -days 1000 -in "' + defaultCSRPath + '" -signkey "' +
+              defaultKeyPath + '" -out "' + defaultCertPath + '"', function(err) {
 
               handleCreatingCertError(err);
               err || createServer();
